@@ -157,5 +157,37 @@
     return !!r && r.bottom >= 0 && r.right >= 0 && r.top <= viewportH() && r.left <= viewportW();
   };
 
+  /**
+   * Get viewable rectangle.
+   * return {boolean|object}
+   */
+  xports['viewable'] = function(el, cushion, threshold) {
+      var r = rectangle(el, cushion);
+      if (!!r) {
+          //clamp bottom and right values to viewport height and width
+          var bottom = r.bottom > viewportH() ? viewportH() : r.bottom;
+          var right = r.right > viewportW() ? viewportW() : r.right;
+
+          var viewableWidth = r.left > 0 ? right - r.left : right;
+          var viewableHeight = r.top > 0 ? bottom - r.top : bottom;
+          var viewableArea = viewableWidth * viewableHeight;
+          var viewableRatio = viewableArea / (r.width * r.height);
+          //clamp ratio value to 0 - 1
+          viewableRatio = viewableRatio > 1 ? 1 : viewableRatio;
+
+          var percent = parseFloat((viewableRatio * 100).toFixed(2));
+
+          return {
+              top: r.top,
+              bottom: r.bottom,
+              left: r.left,
+              right: r.right,
+              percent: percent,
+              inView: percent >= threshold
+         }
+      }
+      return null;
+  };
+  
   return xports;
 });
